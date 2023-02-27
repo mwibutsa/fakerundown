@@ -15,7 +15,7 @@ import swaggerDocument from '@swaggerDocs';
 import statusCodes from '@constants/statusCodes';
 import { getDBUri } from '@dbConfig';
 import router from './api';
-
+import { generateEvent } from './services';
 const app = express();
 
 const MongoStore = connectMongo(expressSession);
@@ -52,6 +52,9 @@ export const applyMiddleware = async (): Promise<void> => {
 };
 
 export const applyRoutes = (): void => {
+  app.get('/', (req, res) => {
+    return res.json(generateEvent());
+  });
   app.use('/api/v1', router);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 };
@@ -87,3 +90,5 @@ const applyAll = async () => {
 applyAll();
 
 export default app;
+
+[];

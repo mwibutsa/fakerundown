@@ -22,6 +22,7 @@ module.exports = {
           '@api': './src/api',
           '@types': './src/types',
           '@interfaces': './src/interfaces',
+          '@services': './src/services',
           '@dbConfig': './src/db/dbConfig',
           '@constants': './src/constants',
           '@db': './src/db',

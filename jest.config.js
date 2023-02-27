@@ -21,6 +21,7 @@ module.exports = {
     '@utils(.*)': '<rootDir>/src/utils/$1',
     '@helpers(.*)': '<rootDir>/src/helpers/$1',
     '@dbConfig(.*)': '<rootDir>/src/db/dbConfig/$1',
+    '@services(.*)': '<rootDir>/src/services/$1',
     '@app': '<rootDir>/src/app',
     '@swaggerDocs': '<rootDir>/src/swaggerDocs',
     '@testData(.*)': '<rootDir>/src/testData/$1',

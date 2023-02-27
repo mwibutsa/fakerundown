@@ -1,18 +1,3 @@
-import { ObjectId } from 'mongoose';
-
-export interface IUser {
-  firstName: string;
-  lastName: string;
-  middleName: string;
-  username: string;
-  email: string;
-  phoneNumber: string;
-  profilePic?: string;
-  password: string;
-  isValidPassword: (password: string) => Promise<boolean>;
-  id?: ObjectId;
-}
-
 export interface ISchedule {
   attendance: number;
   event_headline: string;
@@ -33,9 +18,7 @@ export interface IScore {
   game_clock: number;
   game_period: number;
   score_away: number;
-  score_away_by_period: number[];
   score_home: number;
-  score_home_by_period: number[];
   venue_location: string;
   venue_name: string;
   winner_away: number;
@@ -62,7 +45,7 @@ export interface ITeamsNormalized {
 }
 
 export interface IEvent {
-  event_date: Date;
+  event_date: Date | string;
   event_id: string;
   event_uuid: string;
   rotation_number_away: number;
@@ -70,8 +53,8 @@ export interface IEvent {
   schedule: ISchedule;
   score: IScore;
   sport_id: number;
-  teams: Array<ITeam>;
-  teams_normalized: Array<ITeamsNormalized>;
+  teams: ITeam[];
+  teams_normalized: ITeamsNormalized[];
   event_name: string;
 }
 
@@ -80,6 +63,6 @@ export interface IMeta {
 }
 
 export interface IRootObject {
-  events: Array<IEvent>;
+  events: IEvent[];
   meta: IMeta;
 }
