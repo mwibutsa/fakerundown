@@ -48,6 +48,7 @@ export interface ITeam {
   name: string;
   team_id: number;
   team_normalized_id: number;
+  toObject?: () => ITeam;
 }
 
 export interface ITeamsNormalized {
@@ -59,6 +60,7 @@ export interface ITeamsNormalized {
   ranking: number;
   record: string;
   team_id: number;
+  toObject?: () => ITeamsNormalized;
 }
 
 export interface IEvent {

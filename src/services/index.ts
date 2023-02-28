@@ -1,10 +1,11 @@
 import { GameEventModel } from '@models/index';
-import { IEvent } from './../interfaces/response';
+import { IEvent, ITeamsNormalized } from './../interfaces/response';
 import { IScore, ITeam } from '@interfaces/response';
 import { faker } from '@faker-js/faker';
-import { ISchedule, ITeamsNormalized } from '@interfaces/models';
+import { ISchedule, IteamsNormalized } from '@interfaces/models';
 import moment from 'moment';
 import nodeSchedule from 'node-schedule';
+import _ from 'lodash';
 
 export const generateTeam = (is_away = faker.datatype.boolean()): ITeam => ({
   is_away,
@@ -16,7 +17,7 @@ export const generateTeam = (is_away = faker.datatype.boolean()): ITeam => ({
   team_normalized_id: faker.datatype.number({ min: 100, max: 9999 }),
 });
 
-export const generateNormalizedTeam = (team: ITeam = generateTeam()): ITeamsNormalized & ITeam => {
+export const generateNormalizedTeam = (team: ITeam = generateTeam()): IteamsNormalized & ITeam => {
   return {
     ...team,
     mascot: `${faker.datatype.number({ min: 1, max: 100 })}ers`,
@@ -47,21 +48,9 @@ export const generateScore = (): IScore => {
     score_home: faker.datatype.number({ min: 71, max: 120 }),
     venue_name: `${faker.address.streetAddress()} Stadium`,
     get winner_away() {
-      console.log('Away');
-      console.log('this.score_away', this.score_away);
-      console.log('this.score_home', this.score_home);
-      console.log('this.score_away > this.score_home', this.score_away > this.score_home);
-      console.log('this.score_home', this.score_home);
-
       return this.score_away > this.score_home ? 1 : 0;
     },
     get winner_home() {
-      console.log('Home');
-      console.log('this.score_away', this.score_away);
-      console.log('this.score_home', this.score_home);
-      console.log('this.score_home > this.score_away', this.score_home > this.score_away);
-      console.log('this.score_away', this.score_away);
-
       return this.score_home > this.score_away ? 1 : 0;
     },
   };
@@ -93,13 +82,13 @@ export const generateEvent = (): IEvent => {
   const is_away = faker.datatype.boolean();
   now.setUTCHours;
   const event = {
-    event_date: new Date(now.setMinutes(now.getMinutes() + faker.datatype.number({ min: 2, max: 60 }))).toISOString(),
+    event_date: new Date(now.setMinutes(now.getMinutes() + faker.datatype.number({ min: 10, max: 60 }))).toISOString(),
     event_id: faker.database.mongodbObjectId(),
     event_uuid: faker.datatype.uuid(),
     rotation_number_away: 0,
     rotation_number_home: 0,
     schedule: generateSchedule(),
-    sport_id: 1,
+    sport_id: 5,
     teams: [generateTeam(is_away), generateTeam(!is_away)],
     score: generateScore(),
     get teams_normalized() {
@@ -147,4 +136,46 @@ export const generateEvent = (): IEvent => {
   );
 
   return event;
+};
+
+/**
+ * TODO:
+ * 1. Winners
+ */
+
+// Generate a subsequent round of events
+
+export const generateSubsequentEvents = async () => {
+  // Look up the events and get the winning team with status completed
+  const events = await GameEventModel.find({
+    'score.event_status': 'STATUS_FINAL',
+  }).select({ teams: 1, teams_normalized: 1, 'score.winner_away': 1, 'score.winner_home': 1 });
+
+  const newEvents = events.map(({ teams, teams_normalized: teamsN, score }) => {
+    const filterHandler = (object: { [key: string]: any }) => {
+      const wonHome = object.is_home && score.winner_home;
+      const wonAway = object.is_away && score.winner_away;
+      return wonHome || wonAway === 1;
+    };
+    const teams_normalized = teamsN?.filter(filterHandler);
+    return { teams: teams?.filter(filterHandler), teams_normalized };
+  });
+
+  const totalTeams = newEvents.length;
+
+  const groupA = newEvents.slice(0, totalTeams / 2);
+  const groupB = newEvents.slice(totalTeams / 2).map(({ teams, teams_normalized }) => {
+    const team = teams[0]?.toObject?.();
+    const teamN = teams_normalized[0]?.toObject?.();
+    return {
+      teams: [{ ...team, is_away: true, is_home: false }],
+      teams_normalized: [{ ...teamN, is_away: true, is_home: false }],
+    };
+  });
+
+  for (let i = 0; i < totalTeams / 2 - 1; i++) {
+    groupA[i].teams.push(groupB[i].teams[0] as unknown as ITeam);
+    groupA[i].teams_normalized.push(groupB[i].teams_normalized[0] as unknown as ITeamsNormalized);
+  }
+  return groupA.map((event) => ({ ...generateEvent(), ...event }));
 };

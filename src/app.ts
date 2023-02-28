@@ -1,3 +1,4 @@
+import { generateSubsequentEvents } from './services/index';
 import 'dotenv/config';
 import '@dbConfig/plugins';
 import cors from 'cors';
@@ -16,6 +17,7 @@ import statusCodes from '@constants/statusCodes';
 import { getDBUri } from '@dbConfig';
 import router from './api';
 import { generateEvent } from './services';
+
 const app = express();
 
 const MongoStore = connectMongo(expressSession);
@@ -54,6 +56,10 @@ export const applyMiddleware = async (): Promise<void> => {
 export const applyRoutes = (): void => {
   app.get('/', (req, res) => {
     return res.json(generateEvent());
+  });
+  app.get('/teams', async (req, res) => {
+    const teams = await generateSubsequentEvents();
+    return res.json(teams);
   });
   app.use('/api/v1', router);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
