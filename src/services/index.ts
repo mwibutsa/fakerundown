@@ -1,11 +1,10 @@
 import { GameEventModel } from '@models/index';
-import { IEvent, ITeamsNormalized } from './../interfaces/response';
+import { IEvent } from '@interfaces/response';
 import { IScore, ITeam } from '@interfaces/response';
 import { faker } from '@faker-js/faker';
-import { ISchedule, IteamsNormalized } from '@interfaces/models';
+import { ISchedule, ITeamsNormalized } from '@interfaces/models';
 import moment from 'moment';
 import nodeSchedule from 'node-schedule';
-import _ from 'lodash';
 
 export const generateTeam = (is_away = faker.datatype.boolean()): ITeam => ({
   is_away,
@@ -17,7 +16,7 @@ export const generateTeam = (is_away = faker.datatype.boolean()): ITeam => ({
   team_normalized_id: faker.datatype.number({ min: 100, max: 9999 }),
 });
 
-export const generateNormalizedTeam = (team: ITeam = generateTeam()): IteamsNormalized & ITeam => {
+export const generateNormalizedTeam = (team: ITeam = generateTeam()): ITeamsNormalized & ITeam => {
   return {
     ...team,
     mascot: `${faker.datatype.number({ min: 1, max: 100 })}ers`,
@@ -82,7 +81,9 @@ export const generateEvent = (): IEvent => {
   const is_away = faker.datatype.boolean();
   now.setUTCHours;
   const event = {
-    event_date: new Date(now.setMinutes(now.getMinutes() + faker.datatype.number({ min: 10, max: 60 }))).toISOString(),
+    event_date: new Date(
+      now.setMinutes(now.getMinutes() + faker.datatype.number({ min: 200, max: 230 })),
+    ).toISOString(),
     event_id: faker.database.mongodbObjectId(),
     event_uuid: faker.datatype.uuid(),
     rotation_number_away: 0,
