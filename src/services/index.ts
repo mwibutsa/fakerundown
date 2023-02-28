@@ -52,10 +52,10 @@ export const generateScore = (): IScore => {
     },
     venue_name: `${faker.address.streetAddress()} Stadium`,
     get winner_away() {
-      return +(this.score_away > this.score_home);
+      return Number(this.score_away > this.score_home);
     },
     get winner_home() {
-      return +(this.score_home > this.score_away);
+      return Number(this.score_home > this.score_away);
     },
   };
 };
@@ -83,6 +83,7 @@ export const generateSchedule = (): ISchedule => {
 
 export const generateEvent = (): IEvent => {
   const now = new Date();
+  const is_away = faker.datatype.boolean();
   now.setUTCHours;
   const event = {
     event_date: new Date(now.setMinutes(now.getMinutes() + faker.datatype.number({ min: 2, max: 60 }))).toISOString(),
@@ -91,9 +92,9 @@ export const generateEvent = (): IEvent => {
     rotation_number_away: 0,
     rotation_number_home: 0,
     schedule: generateSchedule(),
-    score: generateScore(),
     sport_id: 1,
-    teams: [generateTeam(true), generateTeam(false)],
+    teams: [generateTeam(is_away), generateTeam(!is_away)],
+    score: generateScore(),
     get teams_normalized() {
       return [generateNormalizedTeam(this.teams[0]), generateNormalizedTeam(this.teams[1])];
     },
