@@ -43,19 +43,26 @@ export const generateScore = (): IScore => {
     venue_location: `${faker.address.cityName()}, ${faker.address.stateAbbr()}`,
     game_clock: faker.datatype.number({ min: 0, max: 12 }),
     game_period: faker.datatype.number({ min: 1, max: 4 }),
-    score_away: faker.datatype.number({ min: 10, max: 120 }),
-    get score_home() {
-      const number = faker.datatype.number({ min: 0, max: 10 });
-      return number % 2
-        ? faker.datatype.number({ min: 0, max: this.score_away - 1 })
-        : faker.datatype.number({ min: this.score_away + 1, max: 121 });
-    },
+    score_away: faker.datatype.number({ min: 10, max: 70 }),
+    score_home: faker.datatype.number({ min: 71, max: 120 }),
     venue_name: `${faker.address.streetAddress()} Stadium`,
     get winner_away() {
-      return Number(this.score_away > this.score_home);
+      console.log('Away');
+      console.log('this.score_away', this.score_away);
+      console.log('this.score_home', this.score_home);
+      console.log('this.score_away > this.score_home', this.score_away > this.score_home);
+      console.log('this.score_home', this.score_home);
+
+      return this.score_away > this.score_home ? 1 : 0;
     },
     get winner_home() {
-      return Number(this.score_home > this.score_away);
+      console.log('Home');
+      console.log('this.score_away', this.score_away);
+      console.log('this.score_home', this.score_home);
+      console.log('this.score_home > this.score_away', this.score_home > this.score_away);
+      console.log('this.score_away', this.score_away);
+
+      return this.score_home > this.score_away ? 1 : 0;
     },
   };
 };
